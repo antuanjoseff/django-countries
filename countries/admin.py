@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.contrib.gis import admin as gisadmin
 from .models import Country, Institution
 from .widgets import CustomGeoWidget
+from .forms import InstitutionAdminForm
+from django import forms
+from django.urls import reverse_lazy
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -11,8 +14,9 @@ class CountryAdmin(admin.ModelAdmin):
 
 
 class InstitutionAdmin(gisadmin.GISModelAdmin):
-    autocomplete_fields = ['country']
     gis_widget = CustomGeoWidget
+    # form = InstitutionAdminForm
+    autocomplete_fields = ['country']
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(InstitutionAdmin, self).get_form(request, obj, **kwargs)
@@ -21,6 +25,13 @@ class InstitutionAdmin(gisadmin.GISModelAdmin):
         field.widget.can_add_related = False
         field.widget.can_change_related = False
         field.widget.can_delete_related = False
+
+        htmx_attrs = {
+            "hx-get": reverse_lazy("get_country_bbox"),
+            "hx-swap": "outerHTML",
+            "hx-trigger": "load,change",
+            "hx-target": "#id_bbox",
+        }        
 
         return form
 
