@@ -14,9 +14,10 @@ class CountryAdmin(admin.ModelAdmin):
 
 
 class InstitutionAdmin(gisadmin.GISModelAdmin):
+    
     gis_widget = CustomGeoWidget
-    # form = InstitutionAdminForm
-    autocomplete_fields = ['country']
+    form = InstitutionAdminForm
+    # autocomplete_fields = ['country']
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(InstitutionAdmin, self).get_form(request, obj, **kwargs)
@@ -26,19 +27,15 @@ class InstitutionAdmin(gisadmin.GISModelAdmin):
         field.widget.can_change_related = False
         field.widget.can_delete_related = False
 
-        htmx_attrs = {
-            "hx-get": reverse_lazy("get_country_bbox"),
-            "hx-swap": "outerHTML",
-            "hx-trigger": "load,change",
-            "hx-target": "#id_bbox",
-        }        
-
         return form
 
     class Meta:
         verbose_name = 'Institució'
         verbose_name_plural = 'Institucions'
 
+
+    class Media:
+         js = ["admin/js/institutions.js"]
 
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Institution, InstitutionAdmin)

@@ -12,7 +12,7 @@ class InstitutionAdminForm(forms.ModelForm):
         htmx_attrs = {
             "hx-get": reverse_lazy("get_country_bbox"),
             "hx-swap": "outerHTML",
-            "hx-trigger": "load,change",
+            "hx-trigger": "change",
             "hx-target": "#id_bbox",
         }        
 

@@ -69,6 +69,7 @@ class MapWidget {
         mapContainer.style.height = `${mapContainer.dataset.height}px`;
         this.map = this.createMap();
         this.featureCollection = new ol.Collection();
+
         this.featureOverlay = new ol.layer.Vector({
             map: this.map,
             source: new ol.source.Vector({
@@ -88,6 +89,14 @@ class MapWidget {
             updateWhileInteracting: true // optional, for instant visual feedback
         });
 
+
+        this.countrySource = new ol.source.Vector({
+            format: new ol.format.GeoJSON,
+            features: []
+          });
+        
+        this.countryLayer = null
+                
         // Populate and set handlers for the feature container
         const self = this;
         this.featureCollection.on('add', function(event) {
@@ -132,17 +141,66 @@ class MapWidget {
         this.ready = true;
     }
 
+   
+    addCountryLayer(geojson){
+        this.countrySource.clear()
+        this.countrySource = new ol.source.Vector({
+            format: new ol.format.GeoJSON,
+            features: new ol.format.GeoJSON().readFeatures(geojson),
+          });
+          
+          this.countryLayer = new ol.layer.Vector({
+            source: this.countrySource,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'blue',
+                    width: 3,
+                  }),
+                //   fill: new ol.style.Fill({
+                //     color: 'rgba(0, 0, 255, 0.1)',
+                //   }),
+            })
+          });
+          this.map.addLayer(this.countryLayer)
+          var padding = [50, 50, 50, 50]
+
+          var unlimited_view = new ol.View({
+            zoom: this.options.default_zoom,
+            maxZoom: 8,
+            projection: 'EPSG:4326',
+          })
+
+          var _this = this
+          const doNewView = () => {
+            var new_extent = _this.map.getView().calculateExtent(_this.map.getSize())  
+
+            var limited_view = new ol.View({
+              zoom: _this.options.default_zoom,
+              maxZoom: 8,
+              projection: 'EPSG:4326',
+              extent: new_extent
+            })
+
+            limited_view.fit(new_extent)
+            _this.map.setView(limited_view)
+          }  
+          this.map.setView(unlimited_view)
+          this.map.getView().fit(this.countrySource.getExtent(), {padding, callback: doNewView});                 
+    }
+
     createMap() {
         return new ol.Map({
             target: this.options.map_id,
             layers: [this.options.base_layer],
             view: new ol.View({
                 zoom: this.options.default_zoom,
-                maxZoom: 5,
+                maxZoom: 8,
+                projection: 'EPSG:4326',
             })
         });
     }
 
+    
     createInteractions() {
         // Initialize the modify interaction
         this.interactions.modify = new ol.interaction.Modify({

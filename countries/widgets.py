@@ -6,6 +6,8 @@ class CustomGeoWidget(BaseGeometryWidget):
     default_lon = 0
     default_lat = 0
     default_zoom = 1
+    map_width = 800
+    map_height = 600
     
     class Media:
         css = {

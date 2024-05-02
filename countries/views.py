@@ -1,13 +1,16 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from .models import Country
+from django.core.exceptions import PermissionDenied
+from django.contrib.gis.db.models.functions import AsGeoJSON
+
 
 def get_country_bbox(request):
-    coto_id = request.GET.get('country', '')
-    bbox = Country.objects.filter(pk=coto_id).values_list('bbox').first()
+    if request.user.is_authenticated:
+        iso3 = request.GET.get('country', '')
+        qs = Country.objects.values('bbox').annotate(geojson=AsGeoJSON("geom")).filter(pk=iso3)      
 
-    return HttpResponse("""
-        <input type="text" name="bbox" required="" id="id_bbox" value="{}">
-        <script>
-           changeMapView()
-        </script>
-    """.format(bbox))
+        return JsonResponse(list(qs), safe=False)
+    
+    else: 
+        raise PermissionDenied()

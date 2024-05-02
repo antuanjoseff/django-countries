@@ -1,9 +1,11 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.db import models
 
 class Country(models.Model):
     iso2 = models.CharField(max_length=2)
-    iso3 = models.CharField(max_length=3)
+    iso3 = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=200)
+    geom = models.MultiPolygonField(spatial_index=False, null=True, blank=True)
     bbox = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
@@ -16,7 +18,7 @@ class Country(models.Model):
 class Institution(models.Model):
     name = models.CharField(max_length=255, verbose_name='Nom')
     country = models.ForeignKey('Country', on_delete=models.CASCADE, verbose_name='País')
-    geom = models.PointField(null=True, blank=True, spatial_index=False)
+    geom = models.PointField( spatial_index=False, verbose_name='Localització')
     
     class Meta:
         verbose_name = 'Institució'
