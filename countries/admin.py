@@ -93,5 +93,5 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(Institution, InstitutionAdmin)
 
 admin.site.register(Person)
-admin.site.register(Mobility)
+# admin.site.register(Mobility)
 # admin.site.register(MobilityCalendar)
