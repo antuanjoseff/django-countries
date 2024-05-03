@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_htmx',
+    'tabbed_admin',
     'countries'
 ]
 
@@ -127,6 +128,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TABBED_ADMIN_USE_JQUERY_UI = True
 
 # Overwrite settings
 extra_settings_dir = os.path.dirname(os.path.abspath(__file__))

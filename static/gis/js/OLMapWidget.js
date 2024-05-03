@@ -43,6 +43,7 @@ class MapWidget {
         this.interactions = {draw: null, modify: null};
         this.typeChoices = false;
         this.ready = false;
+        this.countryGeojson = null
 
         // Default options
         this.options = {
@@ -51,6 +52,21 @@ class MapWidget {
             default_zoom: 12,
             is_collection: options.geom_name.includes('Multi') || options.geom_name.includes('Collection')
         };
+
+        this.unlimited_view = new ol.View({
+            zoom: this.options.default_zoom,
+            maxZoom: 8,
+            projection: 'EPSG:4326',
+          })
+
+        this.drawStyles = new ol.style.Style({
+            image: new ol.style.Icon({
+                anchor: [0.5, 46],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+            }),
+        })        
 
         // Altering using user-provided options
         for (const property in options) {
@@ -76,15 +92,7 @@ class MapWidget {
                 features: this.featureCollection,
                 useSpatialIndex: false // improve performance
             }),
-            style: new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 7,
-                    fill: new ol.style.Fill({color: 'black'}),
-                    stroke: new ol.style.Stroke({
-                      color: [255,0,0], width: 2
-                    })
-                  })
-	        }),            
+            style: this.drawStyles,            
             updateWhileAnimating: true, // optional, for instant visual feedback
             updateWhileInteracting: true // optional, for instant visual feedback
         });
@@ -139,10 +147,13 @@ class MapWidget {
             });
         }
         this.ready = true;
+        
     }
 
    
     addCountryLayer(geojson){
+        console.log('add country layer')
+        this.countryGeojson = geojson
         this.countrySource.clear()
         this.countrySource = new ol.source.Vector({
             format: new ol.format.GeoJSON,
@@ -164,12 +175,6 @@ class MapWidget {
           this.map.addLayer(this.countryLayer)
           var padding = [50, 50, 50, 50]
 
-          var unlimited_view = new ol.View({
-            zoom: this.options.default_zoom,
-            maxZoom: 8,
-            projection: 'EPSG:4326',
-          })
-
           var _this = this
           const doNewView = () => {
             var new_extent = _this.map.getView().calculateExtent(_this.map.getSize())  
@@ -184,8 +189,15 @@ class MapWidget {
             limited_view.fit(new_extent)
             _this.map.setView(limited_view)
           }  
-          this.map.setView(unlimited_view)
+          this.map.setView(this.unlimited_view)
           this.map.getView().fit(this.countrySource.getExtent(), {padding, callback: doNewView});                 
+    }
+
+    resetMap() {
+        this.map.removeLayer(this.countryLayer)
+        this.map.setView(this.unlimited_view)
+        this.map.getView().setZoom(1)
+        this.map.getView().setCenter([0,0])
     }
 
     createMap() {
@@ -224,7 +236,8 @@ class MapWidget {
         }
         this.interactions.draw = new ol.interaction.Draw({
             features: this.featureCollection,
-            type: geomType
+            type: geomType,
+            style: this.drawStyles
         });
 
         this.map.addInteraction(this.interactions.draw);
