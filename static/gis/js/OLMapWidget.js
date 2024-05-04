@@ -222,7 +222,10 @@ class MapWidget {
                     ol.events.condition.singleClick(event);
             }
         });
-
+        this.interactions.modify.on('modifyend', (e)=>{
+            var coords = e.features.getArray()[0].getGeometry().getCoordinates()
+            this.get_country_from_point(coords)
+        })
         // Initialize the draw interaction
         let geomType = this.options.geom_name;
         if (geomType === "Geometry" || geomType === "GeometryCollection") {
@@ -239,11 +242,29 @@ class MapWidget {
             type: geomType,
             style: this.drawStyles
         });
-
+        this.interactions.draw.on('drawend', (e)=>{
+            var coords = e.feature.getGeometry().getCoordinates()
+            this.get_country_from_point(coords)
+        })
         this.map.addInteraction(this.interactions.draw);
         this.map.addInteraction(this.interactions.modify);
     }
 
+    get_country_from_point(coords){
+        var lat = coords[0].toFixed(5)
+        var lng = coords[1].toFixed(5)
+        const url = "http://localhost:8000/countries/get_country_from_point?lat=" + lat + '&lng=' + lng
+        fetch(url)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(json) {
+                var val = json[0]
+                console.log(val)
+                document.getElementById('id_country').value = val['iso3']
+            });
+    }
+    
     defaultCenter() {
         const center = [this.options.default_lon, this.options.default_lat];
         if (this.options.map_srid) {

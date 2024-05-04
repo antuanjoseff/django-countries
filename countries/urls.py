@@ -6,4 +6,5 @@ from . import views
 
 urlpatterns = [
     path("get_country_bbox/", views.get_country_bbox, name="get_country_bbox"),
+    path("get_country_from_point/", views.get_country_from_point, name="get_country_from_point"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

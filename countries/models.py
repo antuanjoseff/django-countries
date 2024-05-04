@@ -12,7 +12,7 @@ class Country(models.Model):
             verbose_name_plural = 'Països'
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.iso3)
+        return self.name
 
 
 class Person(models.Model):
