@@ -150,49 +150,6 @@ class MapWidget {
         
     }
 
-   
-    addCountryLayer(geojson){
-        console.log('add country layer')
-        this.countryGeojson = geojson
-        this.countrySource.clear()
-        this.countrySource = new ol.source.Vector({
-            format: new ol.format.GeoJSON,
-            features: new ol.format.GeoJSON().readFeatures(geojson),
-          });
-          
-          this.countryLayer = new ol.layer.Vector({
-            source: this.countrySource,
-            style: new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: 'blue',
-                    width: 3,
-                  }),
-                //   fill: new ol.style.Fill({
-                //     color: 'rgba(0, 0, 255, 0.1)',
-                //   }),
-            })
-          });
-          this.map.addLayer(this.countryLayer)
-          var padding = [50, 50, 50, 50]
-
-          var _this = this
-          const doNewView = () => {
-            var new_extent = _this.map.getView().calculateExtent(_this.map.getSize())  
-
-            var limited_view = new ol.View({
-              zoom: _this.options.default_zoom,
-              maxZoom: 8,
-              projection: 'EPSG:4326',
-              extent: new_extent
-            })
-
-            limited_view.fit(new_extent)
-            _this.map.setView(limited_view)
-          }  
-          this.map.setView(this.unlimited_view)
-          this.map.getView().fit(this.countrySource.getExtent(), {padding, callback: doNewView});                 
-    }
-
     resetMap() {
         this.map.removeLayer(this.countryLayer)
         this.map.setView(this.unlimited_view)
@@ -222,10 +179,7 @@ class MapWidget {
                     ol.events.condition.singleClick(event);
             }
         });
-        this.interactions.modify.on('modifyend', (e)=>{
-            var coords = e.features.getArray()[0].getGeometry().getCoordinates()
-            this.get_country_from_point(coords)
-        })
+
         // Initialize the draw interaction
         let geomType = this.options.geom_name;
         if (geomType === "Geometry" || geomType === "GeometryCollection") {
@@ -242,29 +196,11 @@ class MapWidget {
             type: geomType,
             style: this.drawStyles
         });
-        this.interactions.draw.on('drawend', (e)=>{
-            var coords = e.feature.getGeometry().getCoordinates()
-            this.get_country_from_point(coords)
-        })
+
         this.map.addInteraction(this.interactions.draw);
         this.map.addInteraction(this.interactions.modify);
     }
-
-    get_country_from_point(coords){
-        var lat = coords[0].toFixed(5)
-        var lng = coords[1].toFixed(5)
-        const url = "http://localhost:8000/countries/get_country_from_point?lat=" + lat + '&lng=' + lng
-        fetch(url)
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(json) {
-                var val = json[0]
-                console.log(val)
-                document.getElementById('id_country').value = val['iso3']
-            });
-    }
-    
+  
     defaultCenter() {
         const center = [this.options.default_lon, this.options.default_lat];
         if (this.options.map_srid) {
