@@ -1,12 +1,12 @@
 {% load i18n l10n %}
 <style>
-    .errorlist{
+    .location-error-msg{
         color: #ba2121;
     }
 </style>
 <div id="{{ id }}_div_map" class="dj_map_wrapper">
     {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
-    <div id="error-location-msg" class="errorlist"></div>
+    <div id="error-location-msg" class="location-error-msg"></div>
     <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
     {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
     {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}

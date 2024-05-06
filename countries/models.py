@@ -48,7 +48,7 @@ class Mobility(models.Model):
     type = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name='Tipus de mobilitat')
     in_or_out = models.CharField(max_length=9,
                   choices=IN_OUT_CHOICES,
-                  default="out")
+                  default="out", verbose_name='In/Out')
     staying_time_units = models.CharField(max_length=9,
                   choices=TIME_UNIT_CHOICES,
                   default="days", verbose_name='Tipus d \'estada')
@@ -68,12 +68,12 @@ class MobilityCalendar(models.Model):
         ("out", "out"),
     )
 
-    yeaar = models.IntegerField(blank=False, null=False)
+    year = models.IntegerField(blank=False, null=False, verbose_name='Any')
     units = models.IntegerField(blank=False, null=False, verbose_name='Número de persones')
     type = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name='Tipus de mobilitat')
     in_or_out = models.CharField(max_length=9,
                   choices=IN_OUT_CHOICES,
-                  default="out")
+                  default="out", verbose_name='In/Out')
 
     institution = models.ForeignKey('Institution', on_delete=models.CASCADE, verbose_name='Institució', null=True, blank=True)
 
@@ -91,13 +91,13 @@ class MobilityDone(models.Model):
         ("out", "out"),
     )
 
-    yeaar = models.IntegerField(blank=False, null=False)
+    year = models.IntegerField(blank=False, null=False, verbose_name='Any')
     
     in_or_out = models.CharField(max_length=9,
                   choices=IN_OUT_CHOICES,
-                  default="out")
+                  default="out", verbose_name='In/Out')
 
-    description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True, verbose_name='Descripció')
 
     program = models.CharField(max_length=255, null=True, blank=True)
 
@@ -108,7 +108,7 @@ class MobilityDone(models.Model):
 class YearResult(models.Model):
     year = models.IntegerField()
 
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, verbose_name='Descripció')
 
 
 class Result(models.Model):
@@ -118,7 +118,7 @@ class Result(models.Model):
 
 
 
-    description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True, verbose_name='Descripció')
     year_result = models.ForeignKey('YearResult', on_delete=models.CASCADE, verbose_name='Resultats')
 
 
@@ -132,7 +132,7 @@ class Institution(models.Model):
 
     country = models.ForeignKey('Country', on_delete=models.CASCADE, verbose_name='País')
 
-    region_ue = models.CharField(max_length=255, verbose_name='Resgió segons UE', null=True, blank=True)
+    region_ue = models.CharField(max_length=255, verbose_name='Regió segons UE', null=True, blank=True)
 
     region_udg = models.CharField(max_length=255, verbose_name='Regió segons UdG', null=True, blank=True)
 
