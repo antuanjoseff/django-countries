@@ -2,7 +2,7 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'countries_cat',
+        'NAME': 'mobilitat_udg',
         'USER': 'postgres',
         'PASSWORD': 'p1234',
         'HOST': 'localhost',
@@ -10,8 +10,8 @@ DATABASES = {
     }
 } 
 
-# GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal303.dll'
-# GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
+GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal303.dll'
+GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
 
 STATIC_URL = 'static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')

@@ -1,14 +1,12 @@
 {% load i18n l10n %}
 <style>
-    #track-length{
-        text-align: center;
-        font-weight: 900;
-        font-size:1.2em;
+    .errorlist{
+        color: #ba2121;
     }
 </style>
 <div id="{{ id }}_div_map" class="dj_map_wrapper">
     {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
-    <div id="track-length"></div>
+    <div id="error-location-msg" class="errorlist"></div>
     <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
     {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
     {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
@@ -32,6 +30,8 @@
             default_lon: {{default_lon}},
         };
         {% endblock %}
+
+        var iso3 = ''
         
         MapWidget.prototype.addCountryLayer = function(geojson) {
             console.log('add country layer')
@@ -86,9 +86,9 @@
                     return response.json();
                 })
                 .then(function(json) {
-                    var val = json[0]
-                    if (document.getElementById('id_country').value !== val['iso3']){
-                        alert('Aqueta localització no es correspon amb el país sel·leccionat')
+                    iso3 = json[0].iso3
+                    if (document.getElementById('id_country').value !== iso3 || iso3 ===''){
+                        document.getElementById('error-location-msg').innerHTML='Aquesta localització no es correspon amb el país sel·leccionat'
                         _this.clearFeatures()
                         _this.enableDrawing()
                     }
@@ -99,13 +99,22 @@
         var {{ module }} = new MapWidget(options);
 
         {{module}}.interactions.modify.on('modifyend', (e)=>{
+            document.getElementById('error-location-msg').innerHTML=''
             var coords = e.features.getArray()[0].getGeometry().getCoordinates()
             {{module}}.get_country_from_point(coords)
         })
 
         {{module}}.interactions.draw.on('drawend', (e)=>{
+            document.getElementById('error-location-msg').innerHTML=''
             var coords = e.feature.getGeometry().getCoordinates()
             {{module}}.get_country_from_point(coords)
+        })
+
+        // Listener for country select 
+        document.getElementById('id_country').addEventListener('change', function(e){
+            if (e.target.value !== iso3){
+                {{module}}.clearFeatures()
+            }
         })
     </script>
 </div>
