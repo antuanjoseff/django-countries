@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis import admin as gisadmin
 from tabbed_admin import TabbedModelAdmin
 
-from .models import Country, Institution, Person, Mobility, MobilityCalendar, MobilityDone
+from .models import Country, Institution, Person, Mobility, MobilityCalendar, MobilityDone, MyUser
 from .widgets import CustomGeoWidget
 from .forms import InstitutionAdminForm
 from django import forms
@@ -110,5 +110,6 @@ admin.site.register(Institution, InstitutionAdmin)
 admin.site.register(Person)
 admin.site.register(Country, CountryAdmin)
 
+admin.site.register(MyUser)
 # admin.site.register(Mobility, MobilityAdmin)
 # admin.site.register(MobilityCalendar)

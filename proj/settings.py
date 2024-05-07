@@ -130,6 +130,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TABBED_ADMIN_USE_JQUERY_UI = True
+AUTH_USER_MODEL = "countries.MyUser"
 
 # Overwrite settings
 extra_settings_dir = os.path.dirname(os.path.abspath(__file__))
@@ -137,6 +138,7 @@ ENVIRONMENT_NAME = os.environ.get('ENVIRONMENT_NAME', 'localhost')
 extra_settings_file = 'settings-%s.py' % ENVIRONMENT_NAME
 extra_settings_path = os.path.join(extra_settings_dir, extra_settings_file)
 print(extra_settings_path)
+
 if os.path.exists(extra_settings_path):
     exec(compile(
         open(

@@ -1,5 +1,9 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.db import models
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+
+class MyUser(AbstractUser):
+    oi = models.CharField(max_length=25, blank=True)
 
 class Country(models.Model):
     iso3 = models.CharField(max_length=3, primary_key=True)
@@ -152,4 +156,7 @@ class Institution(models.Model):
     #MOBILITATS SOL·LICITADES
     motive = models.TextField(null=True, blank=True, verbose_name='Fortaleses de la institució per a la UdG i viceversa')
 
-
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE, null=True, blank=False
+    )

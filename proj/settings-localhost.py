@@ -2,7 +2,7 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'mobilitat_udg',
+        'NAME': 'mobility_udg',
         'USER': 'postgres',
         'PASSWORD': 'p1234',
         'HOST': 'localhost',
