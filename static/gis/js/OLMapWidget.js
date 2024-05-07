@@ -53,18 +53,14 @@ class MapWidget {
             is_collection: options.geom_name.includes('Multi') || options.geom_name.includes('Collection')
         };
 
-        this.unlimited_view = new ol.View({
-            zoom: this.options.default_zoom,
-            maxZoom: 8,
-            projection: 'EPSG:4326',
-          })
-
         this.drawStyles = new ol.style.Style({
             image: new ol.style.Icon({
-                anchor: [0.5, 46],
+                anchor: [0.5, 1],
+                scale: [0.5, 0.5],
                 anchorXUnits: 'fraction',
-                anchorYUnits: 'pixels',
-                src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+                anchorYUnits: 'fraction',
+                // src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+                src: '/static/admin//img/marker.svg',
             }),
         })        
 
@@ -148,13 +144,6 @@ class MapWidget {
         }
         this.ready = true;
         
-    }
-
-    resetMap() {
-        this.map.removeLayer(this.countryLayer)
-        this.map.setView(this.unlimited_view)
-        this.map.getView().setZoom(1)
-        this.map.getView().setCenter([0,0])
     }
 
     createMap() {

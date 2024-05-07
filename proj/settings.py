@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_htmx',
     'tabbed_admin',
-    'countries'
+    'mobility'
 ]
 
 MIDDLEWARE = [
@@ -130,7 +130,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TABBED_ADMIN_USE_JQUERY_UI = True
-AUTH_USER_MODEL = "countries.MyUser"
+AUTH_USER_MODEL = "mobility.User"
 
 # Overwrite settings
 extra_settings_dir = os.path.dirname(os.path.abspath(__file__))

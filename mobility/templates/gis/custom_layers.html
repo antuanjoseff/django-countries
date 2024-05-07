@@ -1,0 +1,116 @@
+{% load i18n l10n %}
+<style>
+    .location-error-msg{
+        color: #ba2121;
+    }
+</style>
+<div id="{{ id }}_div_map" class="dj_map_wrapper">
+    {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
+    <div id="error-location-msg" class="location-error-msg"></div>
+    <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
+    {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
+    {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
+    <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}"
+              {% if not display_raw %} hidden{% endif %}>{{ serialized }}</textarea>
+    <script>
+        {% block base_layer %}
+            var base_layer = new ol.layer.Tile({
+                source: new ol.source.OSM()
+            });
+        {% endblock %}
+        {% block options %}var options = {
+            base_layer: base_layer,
+            geom_name: '{{ geom_type }}',
+            id: '{{ id }}',
+            map_id: '{{ id }}_map',
+            map_srid: {{ map_srid|unlocalize }},
+            name: '{{ name }}',
+            default_zoom: {{default_zoom}},
+            default_lat: {{default_lat}},
+            default_lon: {{default_lon}},
+        };
+        {% endblock %}
+
+        var iso3 = ''
+        
+        MapWidget.prototype.resetMap = function(geojson) {
+            this.map.removeLayer(this.countryLayer)
+            this.map.getView().setZoom(1)
+            this.map.getView().setCenter([0,0])
+        }
+
+        MapWidget.prototype.addCountryLayer = function(geojson) {
+            this.countryGeojson = geojson
+            this.countrySource.clear()
+            this.countrySource = new ol.source.Vector({
+                format: new ol.format.GeoJSON,
+                features: new ol.format.GeoJSON().readFeatures(geojson),
+            });
+            
+            this.countryLayer = new ol.layer.Vector({
+                source: this.countrySource,
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: 'blue',
+                        width: 3,
+                    }),
+                    //   fill: new ol.style.Fill({
+                    //     color: 'rgba(0, 0, 255, 0.1)',
+                    //   }),
+                })
+            });
+            this.map.addLayer(this.countryLayer)
+            var padding = [50, 50, 50, 50]
+
+            var _this = this
+            const doNewView = () => {
+                var new_extent = _this.map.getView().calculateExtent(_this.map.getSize())  
+                _this.map.getView().fit(new_extent, {padding})
+            }  
+            // this.map.setView(this.unlimited_view)
+            this.map.getView().fit(this.countrySource.getExtent(), {padding, callback: doNewView});                 
+        }
+
+
+        MapWidget.prototype.get_country_from_point = function (coords) {
+            var _this = this
+            var lat = coords[0].toFixed(5)
+            var lng = coords[1].toFixed(5)
+            const url = "http://localhost:8000/mobility/get_country_from_point?lat=" + lat + '&lng=' + lng
+            fetch(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(json) {
+                    iso3 = json[0].iso3
+                    if (document.getElementById('id_country').value !== iso3 || iso3 ===''){
+                        document.getElementById('error-location-msg').innerHTML='Aquesta localització no es correspon amb el país sel·leccionat'
+                        _this.clearFeatures()
+                        _this.enableDrawing()
+                    }
+                    
+                });
+        }
+
+        var {{ module }} = new MapWidget(options);
+
+        {{module}}.interactions.modify.on('modifyend', (e)=>{
+            document.getElementById('error-location-msg').innerHTML=''
+            var coords = e.features.getArray()[0].getGeometry().getCoordinates()
+            {{module}}.get_country_from_point(coords)
+        })
+
+        {{module}}.interactions.draw.on('drawend', (e)=>{
+            document.getElementById('error-location-msg').innerHTML=''
+            var coords = e.feature.getGeometry().getCoordinates()
+            {{module}}.get_country_from_point(coords)
+        })
+
+        // Listener for country select 
+        document.getElementById('id_country').addEventListener('change', function(e){
+            if (e.target.value !== iso3){
+                {{module}}.clearFeatures()
+            }
+        })
+    </script>
+</div>

@@ -2,7 +2,8 @@
 document.addEventListener("DOMContentLoaded", function(event) { 
     
     var select_country = document.getElementById('id_country');
-
+    if (!select_country) return;
+    
     // Global variable for this file
     var iso3 = select_country.value
 
@@ -28,7 +29,7 @@ const ajax = (iso3) =>  {
     if (!iso3) {
         return
     }
-    const url = "http://localhost:8000/countries/get_country_bbox?country=" + iso3
+    const url = "http://localhost:8000/mobility/get_country_bbox?country=" + iso3
     fetch(url)
         .then(function(response) {
             return response.json();
